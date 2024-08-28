@@ -3,28 +3,20 @@ package com.example.productmicroservice.Services;
 import com.example.productmicroservice.DTOs.FakeStoreDto;
 import com.example.productmicroservice.Modules.Category;
 import com.example.productmicroservice.Modules.Product;
-import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.*;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-
-import static java.util.Objects.nonNull;
 
 @Service
-public class FakeStoreService implements ProductService {
+public class FakeStoreProductService implements ProductService {
     private RestTemplate restTemplate;
 
-    FakeStoreService(RestTemplate restTemplate) {
+    FakeStoreProductService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
