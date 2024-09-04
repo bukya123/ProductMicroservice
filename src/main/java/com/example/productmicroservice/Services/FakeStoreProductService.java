@@ -3,11 +3,15 @@ package com.example.productmicroservice.Services;
 import com.example.productmicroservice.DTOs.FakeStoreDto;
 import com.example.productmicroservice.Modules.Category;
 import com.example.productmicroservice.Modules.Product;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.*;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +38,17 @@ public class FakeStoreProductService implements ProductService {
         return product;
     }
 
+    public FakeStoreDto call(Product product){
+        FakeStoreDto fakeStoreDto=new FakeStoreDto();
+        fakeStoreDto.setCategory(product.getCategory().getCategoryName());
+        fakeStoreDto.setId(product.getId());
+        fakeStoreDto.setTitle(product.getProductName());
+        fakeStoreDto.setDescription(product.getProductDescription());
+        fakeStoreDto.setPrice(product.getProductPrice());
+        fakeStoreDto.setImage(product.getImage());
+        return fakeStoreDto;
+    }
+
 
     @Override
     public List<Product> getAllProducts() {
@@ -55,7 +70,8 @@ public class FakeStoreProductService implements ProductService {
     }
 
     @Override
-    public Product addProduct(FakeStoreDto product) {
+    public Product addProduct(Product product) {
+
        ResponseEntity<FakeStoreDto>response= restTemplate.postForEntity("https://fakestoreapi.com/products",product,FakeStoreDto.class);
        return convertFakeStoreDtotoProduct(response.getBody());
 
@@ -69,12 +85,12 @@ public class FakeStoreProductService implements ProductService {
 
 
     @Override
-    public Product updateProduct(long id,FakeStoreDto product) {
+    public Product updateProduct(long id,Product product) {
         //first Method-
         // FakeStoreDto response=restTemplate.patchForObject("https://fakestoreapi.com/products",product,FakeStoreDto.class,id);
 
         //second method
-       ResponseEntity<FakeStoreDto>response1=requestForEntity(HttpMethod.PATCH,"https://fakestoreapi.com/products",product,FakeStoreDto.class,id);
+       ResponseEntity<FakeStoreDto>response1=requestForEntity(HttpMethod.PATCH,"https://fakestoreapi.com/products/{id}",product,FakeStoreDto.class,id);
         return convertFakeStoreDtotoProduct(response1.getBody());
 
 
@@ -84,13 +100,13 @@ public class FakeStoreProductService implements ProductService {
     }
 
     @Override
-    public Product deleteProduct(long id) {
+    public void deleteProduct(long id) {
 
-        return null;
+       return ;
     }
 
     @Override
-    public Product replaceProduct(long id,FakeStoreDto product) {
+    public Product replaceProduct(long id,Product product) {
         ResponseEntity<FakeStoreDto>response=requestForEntity(HttpMethod.PUT,"https://fakestoreapi.com/products/{id}",product,FakeStoreDto.class,id);
         return convertFakeStoreDtotoProduct(response.getBody());
     }
