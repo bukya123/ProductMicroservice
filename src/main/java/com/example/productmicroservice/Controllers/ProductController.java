@@ -2,12 +2,16 @@ package com.example.productmicroservice.Controllers;
 
 
 import com.example.productmicroservice.DTOs.FakeStoreDto;
+import com.example.productmicroservice.DTOs.UserDto;
 import com.example.productmicroservice.Modules.Product;
 import com.example.productmicroservice.Services.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -15,16 +19,20 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
     private ProductService productService;
-
-
+    @Autowired
+    private RestTemplate restTemplate;
     public ProductController( ProductService productService) {
+
         this.productService = productService;
     }
 
 
-    @GetMapping()
-    public List<Product> getAllProducts() {
-
+    @GetMapping("/all/{token}")
+    public List<Product> getAllProducts(@PathVariable String token) {
+       ResponseEntity<UserDto>userDto= restTemplate.postForEntity("http://localhost:2028/user/{token}",null,UserDto.class,token);
+       if(userDto.getBody()==null){
+           throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Unauthorized");
+       }
         return productService.getAllProducts();
     }
 
