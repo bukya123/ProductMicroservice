@@ -6,6 +6,9 @@ import com.example.productmicroservice.Modules.Product;
 import com.example.productmicroservice.Repositories.CategoryRepository;
 import com.example.productmicroservice.Repositories.ProductRepository;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,9 +25,12 @@ public class DbProductService implements ProductService {
         this.categoryRepository = categoryRepository;
     }
     @Override
-    public List<Product> getAllProducts() {
-        List<Product>productList=new ArrayList<>();
-        productRepository.findAll().forEach(product->productList.add(product));
+    public Page<Product> getAllProducts(int PageNo,int PageSize,String sortType) {
+        Page<Product> productList=productRepository.findAll(PageRequest.of(PageNo, PageSize,
+                sortType.equals("asc") ? Sort.by("productPrice").ascending() :
+                Sort.by("productPrice").descending())
+        );
+
         return productList;
     }
 

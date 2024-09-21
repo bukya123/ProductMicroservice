@@ -1,39 +1,44 @@
 package com.example.productmicroservice.Controllers;
 
 
+import com.example.productmicroservice.Commons.AuthCommons;
 import com.example.productmicroservice.DTOs.FakeStoreDto;
 import com.example.productmicroservice.DTOs.UserDto;
 import com.example.productmicroservice.Modules.Product;
 import com.example.productmicroservice.Services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
     private ProductService productService;
-    @Autowired
-    private RestTemplate restTemplate;
-    public ProductController( ProductService productService) {
+    private AuthCommons authCommons;
+    public ProductController( ProductService productService, AuthCommons authCommons) {
 
         this.productService = productService;
+        this.authCommons = authCommons;
     }
 
 
-    @GetMapping("/all/{token}")
-    public List<Product> getAllProducts(@PathVariable String token) {
-       ResponseEntity<UserDto>userDto= restTemplate.postForEntity("http://localhost:2028/user/{token}",null,UserDto.class,token);
-       if(userDto.getBody()==null){
-           throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Unauthorized");
-       }
-        return productService.getAllProducts();
+//    @GetMapping("/all/{token}")
+    @GetMapping("/")
+    public Page<Product> getAllProducts(@RequestParam("PageNo") int PageNo, @RequestParam("PageSize") int PageSize,@RequestParam("SortType") String SortType) {
+       //u should not write the validate token using Userservice because the same authencation is needed for category controller also.so it leads to code duplicacy.so create a new file commons.
+//        UserDto userDto=authCommons.validateToken(token);
+//        if(userDto==null) {
+//            return new ArrayList<>();
+//        }
+        return productService.getAllProducts(PageNo,PageSize,SortType);
     }
 
     @GetMapping({"/{productId}"})

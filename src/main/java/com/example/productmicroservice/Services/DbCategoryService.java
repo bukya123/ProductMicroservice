@@ -31,6 +31,11 @@ public class DbCategoryService implements CategoryService {
 
     @Override
     public List<Product> getCategoryByType(String categoryType) {
-        return null;
+        List<Product> productList = new ArrayList<>();
+        productList=categoryRepository.findByCategoryName(categoryType);
+        if(productList.size()==0){
+            throw new RuntimeException("Products not found");
+        }
+        return productList;
     }
 }

@@ -4,6 +4,7 @@ import com.example.productmicroservice.DTOs.FakeStoreDto;
 import com.example.productmicroservice.Modules.Category;
 import com.example.productmicroservice.Modules.Product;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -51,14 +52,14 @@ public class FakeStoreProductService implements ProductService {
 
 
     @Override
-    public List<Product> getAllProducts() {
+    public Page<Product> getAllProducts(int PageNo, int PageSize,String SortType) {
        FakeStoreDto fakeStoreDto[]=restTemplate.getForObject("https://fakestoreapi.com/products",FakeStoreDto[].class);
        List<Product> products=new ArrayList<>();
        for(FakeStoreDto fakeStoreDto1:fakeStoreDto){
            products.add(convertFakeStoreDtotoProduct(fakeStoreDto1));
        }
 
-       return products;
+       return null;
 
 
     }
@@ -102,7 +103,7 @@ public class FakeStoreProductService implements ProductService {
     @Override
     public void deleteProduct(long id) {
 
-       return ;
+      ;
     }
 
     @Override
