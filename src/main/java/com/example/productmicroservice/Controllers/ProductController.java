@@ -4,6 +4,7 @@ package com.example.productmicroservice.Controllers;
 import com.example.productmicroservice.Commons.AuthCommons;
 import com.example.productmicroservice.DTOs.FakeStoreDto;
 import com.example.productmicroservice.DTOs.UserDto;
+import com.example.productmicroservice.Exceptions.InvalidProductException;
 import com.example.productmicroservice.Modules.Product;
 import com.example.productmicroservice.Services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
+    private final RestTemplate restTemplate;
     private ProductService productService;
     private AuthCommons authCommons;
-    public ProductController( ProductService productService, AuthCommons authCommons) {
+    public ProductController(ProductService productService, AuthCommons authCommons, RestTemplate restTemplate) {
 
         this.productService = productService;
         this.authCommons = authCommons;
+        this.restTemplate = restTemplate;
     }
 
 
@@ -42,7 +45,10 @@ public class ProductController {
     }
 
     @GetMapping({"/{productId}"})
-    public ResponseEntity<Product> getSingleProduct(@PathVariable("productId") long productId) {
+    public ResponseEntity<Product> getSingleProduct(@PathVariable("productId") long productId) throws InvalidProductException {
+
+
+        ResponseEntity<String> res=restTemplate.getForEntity("http://UserMicroservice/user/1",String.class);
 
         Product product = productService.getProductById(productId);
         ResponseEntity<Product>responseEntity=new ResponseEntity<>(product, HttpStatus.OK);

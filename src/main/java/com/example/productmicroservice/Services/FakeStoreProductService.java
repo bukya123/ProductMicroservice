@@ -5,6 +5,7 @@ import com.example.productmicroservice.Modules.Category;
 import com.example.productmicroservice.Modules.Product;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -18,11 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Primary
 public class FakeStoreProductService implements ProductService {
     private RestTemplate restTemplate;
+    private RedisTemplate redisTemplate;
 
-    FakeStoreProductService(RestTemplate restTemplate) {
+    FakeStoreProductService(RestTemplate restTemplate,RedisTemplate redisTemplate) {
         this.restTemplate = restTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     public Product convertFakeStoreDtotoProduct(FakeStoreDto fakeStoreDto){
@@ -66,8 +70,15 @@ public class FakeStoreProductService implements ProductService {
 
     @Override
     public Product getProductById(long id) {
+        Product product=(Product) redisTemplate.opsForHash().get("PRODUCTS", "PRODUCT_" + id);
+        if(product!=null){
+            return product;
+        }
+
         ResponseEntity<FakeStoreDto>response=restTemplate.getForEntity("https://fakestoreapi.com/products/"+id,FakeStoreDto.class);
-        return convertFakeStoreDtotoProduct(response.getBody());
+        Product product1= convertFakeStoreDtotoProduct(response.getBody());
+        redisTemplate.opsForHash().put("PRODUCTS", "PRODUCT_" + id, product1);
+        return product1;
     }
 
     @Override
